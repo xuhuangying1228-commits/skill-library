@@ -1,0 +1,1789 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>椰子的 Skill 库</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #fafafa;
+    color: #1f1f1f;
+    line-height: 1.7;
+    padding: 32px 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  header {
+    border-bottom: 2px solid #1f1f1f;
+    padding-bottom: 16px;
+    margin-bottom: 28px;
+  }
+  h1 { font-size: 24px; font-weight: 600; margin-bottom: 6px; }
+  .subtitle { color: #666; font-size: 14px; }
+  .meta { color: #999; font-size: 12px; margin-top: 4px; }
+
+  .mode-switch {
+    display: flex;
+    gap: 0;
+    margin-bottom: 20px;
+    border: 1px solid #1f1f1f;
+    border-radius: 6px;
+    overflow: hidden;
+    width: fit-content;
+  }
+  .mode-btn {
+    padding: 10px 20px;
+    background: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    color: #1f1f1f;
+    transition: all 0.2s;
+  }
+  .mode-btn.active {
+    background: #1f1f1f;
+    color: #fff;
+  }
+  .mode-btn:hover:not(.active) {
+    background: #f0f0f0;
+  }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .search-box {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  .search-box label {
+    display: block;
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 8px;
+  }
+  .search-input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-input:focus {
+    border-color: #1f1f1f;
+  }
+  .search-btn {
+    margin-top: 12px;
+    padding: 10px 20px;
+    background: #1f1f1f;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .search-btn:hover { background: #333; }
+
+  .quick-tags {
+    margin-top: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag {
+    padding: 4px 10px;
+    background: #f0f0f0;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    border: 1px solid #e0e0e0;
+  }
+  .tag:hover { background: #e0e0e0; }
+
+  .result-section { margin-top: 20px; }
+  .result-section h3 {
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: #1f1f1f;
+  }
+  .result-empty {
+    color: #999;
+    font-size: 14px;
+    padding: 20px;
+    text-align: center;
+    background: #fafafa;
+    border-radius: 6px;
+  }
+  .result-card {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+  .result-card .skill-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: #1f1f1f;
+  }
+  .result-card .platform {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-left: 8px;
+    background: #f0f0f0;
+    color: #666;
+  }
+  .result-card .platform.codex {
+    background: #fef3e0;
+    color: #b85c00;
+  }
+  .result-card .platform.workbuddy {
+    background: #e8f0fe;
+    color: #1a5fb4;
+  }
+  .result-card .desc {
+    font-size: 13px;
+    color: #555;
+    margin-top: 6px;
+  }
+  .result-card .trigger {
+    font-size: 12px;
+    color: #888;
+    margin-top: 6px;
+    font-style: italic;
+  }
+  .combo-card {
+    background: #fff8e1;
+    border: 1px solid #f0d97a;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+  .combo-card .combo-title {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+  .combo-card .combo-steps {
+    font-size: 13px;
+    color: #555;
+  }
+  .combo-card .combo-trigger {
+    font-size: 12px;
+    color: #888;
+    margin-top: 8px;
+  }
+
+  .layer-section {
+    margin-bottom: 28px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .layer-header {
+    background: #1f1f1f;
+    color: #fff;
+    padding: 12px 18px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .layer-header .toggle {
+    font-size: 12px;
+    transition: transform 0.2s;
+  }
+  .layer-header.collapsed .toggle {
+    transform: rotate(-90deg);
+  }
+  .layer-body {
+    padding: 16px 18px;
+  }
+  .layer-body.hidden { display: none; }
+  .layer-tag {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    background: #f0f0f0;
+    color: #666;
+    margin-left: 8px;
+    font-weight: normal;
+  }
+
+  .category-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #666;
+    margin: 12px 0 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .skill-item {
+    background: #fafafa;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+  }
+  .skill-item .skill-name {
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .skill-item .platform {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-left: 8px;
+    background: #f0f0f0;
+    color: #666;
+  }
+  .skill-item .platform.codex {
+    background: #fef3e0;
+    color: #b85c00;
+  }
+  .skill-item .platform.workbuddy {
+    background: #e8f0fe;
+    color: #1a5fb4;
+  }
+  .skill-item .desc {
+    font-size: 13px;
+    color: #555;
+    margin-top: 4px;
+  }
+  .skill-item .trigger {
+    font-size: 12px;
+    color: #888;
+    margin-top: 4px;
+    font-style: italic;
+  }
+
+  .simple-rule {
+    background: #1f1f1f;
+    color: #fff;
+    padding: 16px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+  .simple-rule h3 {
+    font-size: 15px;
+    margin-bottom: 8px;
+  }
+  .simple-rule ul {
+    list-style: none;
+    font-size: 13px;
+    line-height: 1.9;
+  }
+  .simple-rule li:before {
+    content: "→ ";
+    color: #f0d97a;
+    margin-right: 6px;
+  }
+
+  .help-text {
+    font-size: 12px;
+    color: #999;
+    margin-top: 6px;
+  }
+
+  .footer {
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid #e0e0e0;
+    font-size: 12px;
+    color: #999;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>椰子的 Skill 库</h1>
+  <div class="subtitle">输入需求,告诉我该用哪个 skill、在哪个平台、怎么用</div>
+  <div class="meta">WorkBuddy 81 个 · Codex 92+ 个 · 全部本地离线</div>
+</header>
+
+<div class="mode-switch">
+  <button class="mode-btn active" onclick="switchMode('match')">智能匹配</button>
+  <button class="mode-btn" onclick="switchMode('index')">完整索引</button>
+</div>
+
+<!-- 智能匹配面板 -->
+<div id="match-panel" class="panel active">
+  <div class="search-box">
+    <label>你的需求</label>
+    <input type="text" class="search-input" id="needInput" placeholder="例:拆一篇爆款笔记 / 优化一篇图文的视觉 / 出一份汇报 deck" />
+    <button class="search-btn" onclick="doMatch()">匹配 skill</button>
+    <div class="help-text">不知道怎么描述？点下面标签快速测试</div>
+    <div class="quick-tags">
+      <span class="tag" onclick="setNeed('分析我自己的笔记为什么没起量')">单篇分析</span>
+      <span class="tag" onclick="setNeed('拆一篇爆款笔记')">拆爆款</span>
+      <span class="tag" onclick="setNeed('重做一篇图文的视觉')">视觉重做</span>
+      <span class="tag" onclick="setNeed('改小红书标题')">改标题</span>
+      <span class="tag" onclick="setNeed('研究一个对标博主')">博主研究</span>
+      <span class="tag" onclick="setNeed('出一份咨询风格的汇报')">出 deck</span>
+      <span class="tag" onclick="setNeed('联网查一个赛道')">联网调研</span>
+      <span class="tag" onclick="setNeed('去 AI 味')">去 AI 味</span>
+      <span class="tag" onclick="setNeed('诊断内容业务')">业务诊断</span>
+    </div>
+  </div>
+
+  <div class="result-section" id="resultSection">
+    <div class="result-empty">在上面输入需求,这里会告诉你用哪个 skill、怎么用</div>
+  </div>
+</div>
+
+<!-- 完整索引面板 -->
+<div id="index-panel" class="panel">
+  <div class="simple-rule">
+    <h3>最省事的触发原则</h3>
+    <ul>
+      <li>查资料 → agent-reach</li>
+      <li>真打开网页 → web-access</li>
+      <li>分析自己单篇 → zoeforwork-xiaohongshu-singlearticleanalyzer-skill</li>
+      <li>拆爆款 → xhs-viral-note-breakdown</li>
+      <li>研究博主 → xhs-blogger-deep-research</li>
+      <li>改图文视觉 → xhs-visual-director-skill</li>
+      <li>写研究稿 → content-research-writer</li>
+      <li>出 deck → mckinsey-research-deck</li>
+      <li>改标题 → dbs-xhs-title</li>
+      <li>不确定用哪个 → ask-matt</li>
+      <li>去 AI 味(收尾) → anti-vibe-writing</li>
+      <li>定义问题 → problem-definition</li>
+      <li>做访谈 → conducting-user-interviews</li>
+      <li>整理反馈 → analyzing-user-feedback</li>
+      <li>排优先级 → prioritizing-roadmap</li>
+      <li>两个方案选哪个 → evaluating-trade-offs</li>
+      <li>砍范围做 MVP → scoping-cutting</li>
+      <li>写 PRD → writing-prds</li>
+      <li>拿到 buy-in → stakeholder-alignment</li>
+    </ul>
+  </div>
+
+  <div class="layer-section">
+    <div class="layer-header" onclick="toggleLayer(this)">
+      <span>第一层 · 主力 9 个 <span class="layer-tag">最贴你工作</span></span>
+      <span class="toggle">▼</span>
+    </div>
+    <div class="layer-body" id="layer-1"></div>
+  </div>
+
+  <div class="layer-section">
+    <div class="layer-header" onclick="toggleLayer(this)">
+      <span>第二层 · 偶尔用 12 个 <span class="layer-tag">按需</span></span>
+      <span class="toggle">▼</span>
+    </div>
+    <div class="layer-body" id="layer-2"></div>
+  </div>
+
+  <div class="layer-section">
+    <div class="layer-header" onclick="toggleLayer(this)">
+      <span>第三层 · 思考诊断类 dbs 系列 <span class="layer-tag">智囊工具</span></span>
+      <span class="toggle">▼</span>
+    </div>
+    <div class="layer-body" id="layer-3"></div>
+  </div>
+
+  <div class="layer-section">
+    <div class="layer-header" onclick="toggleLayer(this)">
+      <span>第四层 · 代码产品类 <span class="layer-tag">开发用</span></span>
+      <span class="toggle">▼</span>
+    </div>
+    <div class="layer-body" id="layer-4"></div>
+  </div>
+
+  <div class="layer-section">
+    <div class="layer-header" onclick="toggleLayer(this)">
+      <span>第五层 · 写作设计表达 + 产品决策链路 <span class="layer-tag">通用增效</span></span>
+      <span class="toggle">▼</span>
+    </div>
+    <div class="layer-body" id="layer-5"></div>
+  </div>
+
+  <div class="layer-section">
+    <div class="layer-header" onclick="toggleLayer(this)">
+      <span>第六层 · 命理类 <span class="layer-tag">当前用不上</span></span>
+      <span class="toggle">▼</span>
+    </div>
+    <div class="layer-body" id="layer-6"></div>
+  </div>
+
+  <div class="layer-section">
+    <div class="layer-header" onclick="toggleLayer(this)">
+      <span>WorkBuddy 端 · 34 个 <span class="layer-tag">主力平台</span></span>
+      <span class="toggle">▼</span>
+    </div>
+    <div class="layer-body" id="layer-wb"></div>
+  </div>
+</div>
+
+<div class="footer">
+  离线可用 · 无外部依赖 · 全部数据内置在 HTML 里
+</div>
+
+<script>
+// ============ 数据源 ============
+const SKILLS = {
+  // 第一层:主力 9 个
+  "zoeforwork-xiaohongshu-singlearticleanalyzer-skill": {
+    platform: "codex", layer: 1,
+    desc: "分析你自己的单篇小红书笔记表现,判断推流走势、互动质量、问题点和优化方向",
+    when: "你有后台截图、数据曲线、笔记链接,想知道为什么起量/没起量",
+    trigger: "用 zoeforwork-xiaohongshu-singlearticleanalyzer-skill 分析这条小红书,材料是这些截图",
+    keywords: ["单篇", "分析", "起量", "没起量", "推流", "互动", "数据曲线", "自己笔记", "自己小红书"]
+  },
+  "xhs-visual-director-skill": {
+    platform: "codex", layer: 1,
+    desc: "做小红书图文视觉策划,包括封面、内页结构、风格、版式、配图提示词",
+    when: "你想重做一篇图文笔记、优化封面、提升收藏率和读完率",
+    trigger: "用 xhs-visual-director-skill 重做这篇图文,目标是更高级、更容易收藏",
+    keywords: ["视觉", "重做", "封面", "图文", "版式", "内页", "收藏率", "配图"]
+  },
+  "xhs-blogger-deep-research": {
+    platform: "codex", layer: 1,
+    desc: "研究一个小红书博主整体打法,拆出他的内容方法论",
+    when: "你想研究对标账号,搞清楚别人为什么能持续出爆款",
+    trigger: "用 xhs-blogger-deep-research 研究这个博主的内容策略",
+    keywords: ["博主", "对标", "研究博主", "方法论", "持续爆款", "整体打法"]
+  },
+  "xhs-viral-note-breakdown": {
+    platform: "codex", layer: 1,
+    desc: "拆解一篇爆款笔记为什么火,重点看标题、封面、结构、关键词和运营动作",
+    when: "你手里有一篇爆文,想学习它的套路",
+    trigger: "用 xhs-viral-note-breakdown 拆这篇爆款笔记",
+    keywords: ["爆款", "拆解", "拆爆款", "爆文", "标题", "套路", "为什么火"]
+  },
+  "mckinsey-research-deck": {
+    platform: "codex", layer: 1,
+    desc: "把研究内容整理成高质量咨询风格 deck 或 PDF",
+    when: "你要汇报、复盘、做方案、做行业研究展示",
+    trigger: "用 mckinsey-research-deck 把这份研究整理成 10 页汇报",
+    keywords: ["deck", "汇报", "咨询", "复盘", "展示", "方案", "pdf", "PPT"]
+  },
+  "agent-reach": {
+    platform: "codex", layer: 1,
+    desc: "联网调研总入口,适合帮我查、帮我搜、帮我找",
+    when: "你要搜行业信息、找案例、查竞品、做研究",
+    trigger: "用 agent-reach 帮我查这个赛道最近 3 个月的变化",
+    keywords: ["联网", "调研", "查", "搜", "找", "行业", "案例", "赛道"]
+  },
+  "web-access": {
+    platform: "codex", layer: 1,
+    desc: "真实访问网页、读动态页面、做网页交互",
+    when: "普通搜索不够,需要真实打开页面、抓页面内容",
+    trigger: "用 web-access 打开这个网页并提取关键信息",
+    keywords: ["打开网页", "访问", "动态页面", "抓页面", "提取"]
+  },
+  "content-research-writer": {
+    platform: "codex", layer: 1,
+    desc: "一边研究,一边写成文章/分析/报告",
+    when: "你不是只想收集资料,而是想直接产出成文",
+    trigger: "用 content-research-writer 把这份调研写成一篇分析稿",
+    keywords: ["写文章", "写分析", "写报告", "研究稿", "成文", "产出"]
+  },
+  "dbs-xhs-title": {
+    platform: "codex", layer: 1,
+    desc: "专门优化小红书标题",
+    when: "你内容方向定了,但标题不够强",
+    trigger: "用 dbs-xhs-title 给这篇笔记出 20 个标题",
+    keywords: ["标题", "改标题", "出标题", "标题优化", "命名"]
+
+  // 第二层
+  },
+  "competitive-ads-extractor": {
+    platform: "codex", layer: 2,
+    desc: "拆竞品广告",
+    trigger: "帮我拆一下这个品牌最近在投什么广告",
+    keywords: ["竞品广告", "广告", "投放"]
+  },
+  "kol-roi-analyzer": {
+    platform: "codex", layer: 2,
+    desc: "分析 KOL 投放效果和 ROI",
+    trigger: "用 kol-roi-analyzer 复盘这批博主投放",
+    keywords: ["KOL", "ROI", "投放复盘", "投放效果"]
+  },
+  "helium-mcp": {
+    platform: "codex", layer: 2,
+    desc: "查实时新闻、市场动态、股价等",
+    trigger: "用 helium-mcp 查一下最近这家公司有什么新消息",
+    keywords: ["新闻", "实时", "股价", "市场动态", "公司动态"]
+  },
+  "notion-research-documentation": {
+    platform: "codex", layer: 2,
+    desc: "从 Notion 里找资料并整理成文档",
+    trigger: "用 notion-research-documentation 帮我整理这个主题",
+    keywords: ["Notion", "找资料", "整理文档"]
+  },
+  "notion-knowledge-capture": {
+    platform: "codex", layer: 2,
+    desc: "把对话或结论沉淀进 Notion",
+    trigger: "把这次讨论整理进 Notion",
+    keywords: ["Notion", "沉淀", "整理对话", "存 Notion"]
+  },
+  "notebooklm-skill": {
+    platform: "codex", layer: 2,
+    desc: "查询你的 NotebookLM 笔记本",
+    trigger: "帮我在 NotebookLM 里找这个主题",
+    keywords: ["NotebookLM", "笔记本", "查询笔记"]
+  },
+  "obsidian-vault": {
+    platform: "codex", layer: 2,
+    desc: "管理 Obsidian 笔记",
+    trigger: "帮我在 Obsidian 里找之前记过的竞品分析",
+    keywords: ["Obsidian", "笔记", "找笔记"]
+  },
+  "paperjsx": {
+    platform: "codex", layer: 2,
+    desc: "生成 PPTX、DOCX、XLSX、PDF 这类正式文件",
+    trigger: "把这个内容导出成 PPTX",
+    keywords: ["PPTX", "DOCX", "XLSX", "PDF", "导出", "生成文件"]
+  },
+  "spreadsheet-formula-helper": {
+    platform: "codex", layer: 2,
+    desc: "写和修表格公式",
+    trigger: "帮我写一个 Google Sheets 公式",
+    keywords: ["公式", "Sheets", "表格公式", "改公式"]
+  },
+  "meeting-notes-and-actions": {
+    platform: "codex", layer: 2,
+    desc: "会议纪要和待办整理",
+    trigger: "把这段会议记录整理成纪要和行动项",
+    keywords: ["会议纪要", "待办", "行动项", "整理会议"]
+  },
+  "internal-comms": {
+    platform: "codex", layer: 2,
+    desc: "写内部汇报、周报、项目更新",
+    trigger: "帮我写一份本周项目进展",
+    keywords: ["周报", "汇报", "内部", "项目更新"]
+
+  // 第三层 dbs 系列
+  },
+  "dbs": {
+    platform: "codex", layer: 3,
+    desc: "商业诊断总入口",
+    trigger: "用 dbs 帮我诊断这个内容业务哪里有问题",
+    keywords: ["诊断", "业务", "总入口", "商业"]
+  },
+  "dbs-diagnosis": {
+    platform: "codex", layer: 3,
+    desc: "商业模式诊断",
+    trigger: "用 dbs-diagnosis 诊断这个商业模式",
+    keywords: ["诊断", "商业模式"]
+  },
+  "dbs-benchmark": {
+    platform: "codex", layer: 3,
+    desc: "对标分析",
+    trigger: "用 dbs-benchmark 给我找 5 个值得学的对标",
+    keywords: ["对标", "benchmark", "对标分析"]
+  },
+  "dbs-content": {
+    platform: "codex", layer: 3,
+    desc: "内容方向与内容问题诊断",
+    trigger: "用 dbs-content 诊断我这个选题为什么不吸引人",
+    keywords: ["内容诊断", "选题", "内容方向"]
+  },
+  "dbs-content-system": {
+    platform: "codex", layer: 3,
+    desc: "内容系统搭建",
+    trigger: "用 dbs-content-system 帮我搭一套内容系统",
+    keywords: ["内容系统", "系统搭建"]
+  },
+  "dbs-decision": {
+    platform: "codex", layer: 3,
+    desc: "长期决策梳理",
+    trigger: "用 dbs-decision 帮我梳理这个长期决策",
+    keywords: ["决策", "长期决策"]
+  },
+  "dbs-goal": {
+    platform: "codex", layer: 3,
+    desc: "把模糊目标变清楚",
+    trigger: "用 dbs-goal 把我这个目标改成可执行版本",
+    keywords: ["目标", "可执行", "目标拆解"]
+  },
+  "dbs-good-question": {
+    platform: "codex", layer: 3,
+    desc: "把烂问题改成好问题",
+    trigger: "用 dbs-good-question 帮我改这个问题",
+    keywords: ["问题", "好问题", "改问题"]
+  },
+  "dbs-deconstruct": {
+    platform: "codex", layer: 3,
+    desc: "拆概念",
+    trigger: "用 dbs-deconstruct 拆一下这个概念",
+    keywords: ["拆解", "拆概念"]
+  },
+  "dbs-action": {
+    platform: "codex", layer: 3,
+    desc: "诊断知道该做什么但做不动",
+    trigger: "用 dbs-action 帮我看下为什么做不动",
+    keywords: ["行动", "做不动", "拖延"]
+  },
+  "dbs-hook": {
+    platform: "codex", layer: 3,
+    desc: "优化短视频开头",
+    trigger: "用 dbs-hook 优化这个短视频开头",
+    keywords: ["hook", "开头", "短视频开头"]
+  },
+  "dbs-learning": {
+    platform: "codex", layer: 3,
+    desc: "做连续学习型内容",
+    trigger: "用 dbs-learning 帮我做一套学习内容",
+    keywords: ["学习", "学习型内容", "系列"]
+  },
+  "dbs-chatroom": {
+    platform: "codex", layer: 3,
+    desc: "多角色讨论一个问题",
+    trigger: "用 dbs-chatroom 让多角色讨论这个",
+    keywords: ["多角色", "讨论", "辩论"]
+  },
+  "dbs-ai-check": {
+    platform: "codex", layer: 3,
+    desc: "检查文案 AI 痕迹",
+    trigger: "用 dbs-ai-check 检查这段文案",
+    keywords: ["AI 痕迹", "AI 检查", "去 AI"]
+  },
+  "dbs-save": {
+    platform: "codex", layer: 3,
+    desc: "保存诊断过程",
+    trigger: "用 dbs-save 保存这次诊断",
+    keywords: ["保存", "存诊断"]
+  },
+  "dbs-restore": {
+    platform: "codex", layer: 3,
+    desc: "恢复诊断过程",
+    trigger: "用 dbs-restore 恢复上次诊断",
+    keywords: ["恢复", "取诊断"]
+  },
+  "dbs-report": {
+    platform: "codex", layer: 3,
+    desc: "汇总诊断过程",
+    trigger: "用 dbs-report 汇总诊断结果",
+    keywords: ["汇总", "诊断汇总"]
+  },
+  "dbs-slowisfast": {
+    platform: "codex", layer: 3,
+    desc: "找更长期、更稳的做法",
+    trigger: "用 dbs-slowisfast 帮我找长期做法",
+    keywords: ["长期", "稳", "慢就是快"]
+  },
+  "dbs-agent-migration": {
+    platform: "codex", layer: 3,
+    desc: "整理 Agent 工作流迁移",
+    trigger: "用 dbs-agent-migration 整理工作流迁移",
+    keywords: ["Agent", "迁移", "工作流"]
+
+  // 第四层:代码产品
+  },
+  "implement": {
+    platform: "codex", layer: 4,
+    desc: "根据需求直接做实现",
+    trigger: "用 implement 按这个需求直接做",
+    keywords: ["实现", "做功能", "写代码"]
+  },
+  "diagnosing-bugs": {
+    platform: "codex", layer: 4,
+    desc: "排查 bug",
+    trigger: "用 diagnosing-bugs 查一下这里为什么报错",
+    keywords: ["bug", "报错", "排查", "调试"]
+  },
+  "domain-modeling": {
+    platform: "codex", layer: 4,
+    desc: "梳理领域模型",
+    trigger: "用 domain-modeling 帮我梳理模型",
+    keywords: ["领域模型", "modeling"]
+  },
+  "codebase-design": {
+    platform: "codex", layer: 4,
+    desc: "设计模块边界和接口",
+    trigger: "用 codebase-design 设计这个模块",
+    keywords: ["模块", "接口", "边界"]
+  },
+  "improve-codebase-architecture": {
+    platform: "codex", layer: 4,
+    desc: "做架构改进建议",
+    trigger: "用 improve-codebase-architecture 看下架构",
+    keywords: ["架构", "改进", "重构"]
+  },
+  "setup-pre-commit": {
+    platform: "codex", layer: 4,
+    desc: "配置提交前检查",
+    trigger: "用 setup-pre-commit 配一下",
+    keywords: ["pre-commit", "提交前", "检查"]
+  },
+  "prototype": {
+    platform: "codex", layer: 4,
+    desc: "快速做一个原型",
+    trigger: "用 prototype 快速做个原型",
+    keywords: ["原型", "prototype", "快速"]
+  },
+  "to-prd": {
+    platform: "codex", layer: 4,
+    desc: "把对话整理成 PRD",
+    trigger: "用 to-prd 把我们刚才的想法整理成 PRD",
+    keywords: ["PRD", "需求文档", "整理需求"]
+  },
+  "to-issues": {
+    platform: "codex", layer: 4,
+    desc: "把方案拆成任务",
+    trigger: "用 to-issues 把方案拆成任务",
+    keywords: ["任务", "拆任务", "issue"]
+  },
+  "triage": {
+    platform: "codex", layer: 4,
+    desc: "分拣 issue / PR",
+    trigger: "用 triage 分拣一下 issue",
+    keywords: ["分拣", "PR", "issue"]
+  },
+  "changelog-generator": {
+    platform: "codex", layer: 4,
+    desc: "生成更新说明",
+    trigger: "用 changelog-generator 生成 changelog",
+    keywords: ["changelog", "更新说明"]
+
+  // 第五层:写作设计表达
+  },
+  "humanizer-zh": {
+    platform: "codex", layer: 5,
+    desc: "中文去 AI 味",
+    trigger: "用 humanizer-zh 把这段文案改得更自然",
+    keywords: ["去 AI 味", "自然", "中文润色", "更像人"]
+  },
+  "stop-slop": {
+    platform: "codex", layer: 5,
+    desc: "去空话和模板味",
+    trigger: "用 stop-slop 去掉这篇文章的 AI 味",
+    keywords: ["空话", "模板", "去模板味"]
+  },
+  "teach": {
+    platform: "codex", layer: 5,
+    desc: "把一个主题讲明白",
+    trigger: "用 teach 把这个主题讲清楚",
+    keywords: ["讲明白", "教", "讲解"]
+  },
+  "theme-factory": {
+    platform: "codex", layer: 5,
+    desc: "给报告或页面套一套统一视觉风格",
+    trigger: "用 theme-factory 给这个报告套个风格",
+    keywords: ["主题", "视觉风格", "统一风格"]
+  },
+  "canvas-design": {
+    platform: "codex", layer: 5,
+    desc: "做静态视觉设计",
+    trigger: "用 canvas-design 做个静态设计",
+    keywords: ["canvas", "静态设计", "视觉"]
+  },
+  "brand-guidelines": {
+    platform: "codex", layer: 5,
+    desc: "套品牌规范",
+    trigger: "用 brand-guidelines 套一下品牌规范",
+    keywords: ["品牌", "规范", "brand"]
+  },
+  "writing-great-skills": {
+    platform: "codex", layer: 5,
+    desc: "更偏给 skill 作者用,不是日常主力",
+    trigger: "用 writing-great-skills 写一个 skill",
+    keywords: ["写 skill", "skill 作者"]
+  },
+  "find-skills": {
+    platform: "codex", layer: 5,
+    desc: "帮你找还缺什么 skill",
+    trigger: "用 find-skills 帮我找缺什么 skill",
+    keywords: ["找 skill", "缺什么 skill"]
+  },
+  "ask-matt": {
+    platform: "codex", layer: 5,
+    desc: "不确定该用哪个 skill 时帮你路由",
+    trigger: "用 ask-matt 帮我路由一下",
+    keywords: ["路由", "选 skill", "不知道用哪个"]
+  },
+  "handoff": {
+    platform: "codex", layer: 5,
+    desc: "把当前讨论整理成交接稿",
+    trigger: "用 handoff 整理一份交接稿",
+    keywords: ["交接", "交接稿"]
+  },
+  "follow-builders": {
+    platform: "codex", layer: 5,
+    desc: "跟踪 AI 创作者和行业动态",
+    trigger: "用 follow-builders 跟踪行业",
+    keywords: ["跟踪", "创作者", "AI 创作者"]
+  },
+  "file-organizer": {
+    platform: "codex", layer: 5,
+    desc: "整理文件",
+    trigger: "用 file-organizer 整理一下文件",
+    keywords: ["整理文件", "文件"]
+  },
+  "grill-me": {
+    platform: "codex", layer: 5,
+    desc: "强行帮你拷问方案漏洞",
+    trigger: "用 grill-me 帮我挑这个方案的漏洞",
+    keywords: ["拷问", "漏洞", "挑刺"]
+  },
+  "grill-with-docs": {
+    platform: "codex", layer: 5,
+    desc: "基于文档拷问方案",
+    trigger: "用 grill-with-docs 基于这份文档拷问",
+    keywords: ["拷问", "文档", "挑刺"]
+  },
+  "grilling": {
+    platform: "codex", layer: 5,
+    desc: "通用拷问",
+    trigger: "用 grilling 拷问下这个方案",
+    keywords: ["拷问", "grilling"]
+
+  // 第六层:命理
+  },
+  "numerologist-bazi": {
+    platform: "codex", layer: 6,
+    desc: "八字分析",
+    trigger: "用 numerologist-bazi 看看八字",
+    keywords: ["八字", "命理"]
+  },
+  "numerologist-qimen": {
+    platform: "codex", layer: 6,
+    desc: "奇门遁甲分析",
+    trigger: "用 numerologist-qimen 看看奇门",
+    keywords: ["奇门", "命理"]
+
+  // ========== Codex · 产品决策链路（9 个）==========
+  },
+  "anti-vibe-writing": {
+    platform: "codex", layer: 5,
+    desc: "把 AI 起草的内容去 AI 味,保留原意但改得更像真人写的。删空泛套话、过度分点、假平衡、装饰格式",
+    trigger: "把这段改得更像人写的,别那么 AI",
+    keywords: ["去 AI 味", "润色", "更像人", "去模板味", "去咨询腔", "自然", "真人"]
+  },
+  "problem-definition": {
+    platform: "codex", layer: 5,
+    desc: "把功能思路改写成问题定义。逼你说清用户在什么时刻卡住,区分客户问题和业务问题,挑出为用 AI 而用 AI 的伪命题",
+    trigger: "先别给方案,先帮我定义问题:用户是谁、在哪个时刻痛、现在怎么凑合解决",
+    keywords: ["问题定义", "定义问题", "solution-first", "需求拆解", "痛点定义", "问题还是方案"]
+  },
+  "conducting-user-interviews": {
+    platform: "codex", layer: 5,
+    desc: "设计用户访谈提纲。把你会不会用改成你上次怎么做,问故事不问观点,看行为不听表态",
+    trigger: "帮我写一份用户访谈提纲",
+    keywords: ["访谈", "用户访谈", "提纲", "需求验证", "问法", "追问"]
+  },
+  "analyzing-user-feedback": {
+    platform: "codex", layer: 5,
+    desc: "把一堆反馈聚类,区分表面抱怨和根因,提醒别只听最吵的人。输出判断+建议动作,不是只做总结",
+    trigger: "把这批反馈按主题归类,找出真正高频的问题",
+    keywords: ["反馈", "用户反馈", "归类", "NPS", "工单", "评论分析", "反馈聚类"]
+  },
+  "prioritizing-roadmap": {
+    platform: "codex", layer: 5,
+    desc: "排需求优先级。按 impact、confidence、urgency、strategic fit 排序,区分大赌注和小子弹,提醒 roadmap 不是承诺清单",
+    trigger: "这 12 个需求帮我排优先级",
+    keywords: ["优先级", "roadmap", "排优先", "排期", "砍需求", "季度规划"]
+  },
+  "evaluating-trade-offs": {
+    platform: "codex", layer: 5,
+    desc: "两个方案选哪个。拆隐性成本、维护成本、机会成本,防 sunk cost,适合速度vs质量、自研vs采购、继续vs止损",
+    trigger: "A 和 B 怎么选?",
+    keywords: ["trade-off", "权衡", "两个方案", "选哪个", "止损", "自研vs采购", "速度vs质量"]
+  },
+  "scoping-cutting": {
+    platform: "codex", layer: 5,
+    desc: "砍范围做 MVP。把估时改成先定 appetite 再倒推范围,逼你砍非核心功能,做完整的小价值闭环不是半截大系统",
+    trigger: "这个需求帮我砍成两周能交付的版本",
+    keywords: ["砍范围", "MVP", "scope", "scope creep", "压缩", "两周", " appetite"]
+  },
+  "writing-prds": {
+    platform: "codex", layer: 5,
+    desc: "写 PRD、需求文档、feature brief。先写 why 不先堆功能,要你定义 success criteria,写轻量但可执行的文档",
+    trigger: "帮我写一版 PRD",
+    keywords: ["PRD", "需求文档", "feature brief", "规格说明", "研发文档"]
+  },
+  "stakeholder-alignment": {
+    platform: "codex", layer: 5,
+    desc: "让别人点头。分析不同人各自关心什么,给选项和推荐不只给一个方案,准备反对意见应对。先做预对齐再开正式会",
+    trigger: "我要和老板对齐这个方案,帮我准备",
+    keywords: ["对齐", "buy-in", "stakeholder", "老板", "提案", "反对意见", "预对齐"]
+  },
+
+  // ========== WorkBuddy ==========
+  "xhs-trend-insights-v2": {
+    platform: "workbuddy",
+    desc: "小红书趋势洞察,看赛道热点、内容方向、营销灵感",
+    trigger: "用 xhs-trend-insights-v2 看下护肤赛道最近趋势",
+    keywords: ["趋势", "热点", "赛道", "灵感", "方向"]
+  },
+  "xhs-competitor-research-v2": {
+    platform: "workbuddy",
+    desc: "小红书竞品研究,同赛道观察、内容角度对比",
+    trigger: "用 xhs-competitor-research-v2 研究这个竞品",
+    keywords: ["竞品", "对标", "同赛道", "竞品分析"]
+  },
+  "xhs-comment-insights": {
+    platform: "workbuddy",
+    desc: "小红书评论洞察、用户反馈、口碑分析、痛点总结、FAQ 整理",
+    trigger: "用 xhs-comment-insights 提炼评论区痛点",
+    keywords: ["评论", "痛点", "反馈", "口碑", "FAQ", "评论区"]
+  },
+  "comment-ops": {
+    platform: "workbuddy",
+    desc: "小红书评论区 AI 助手,一键生成 32 条活人感评论",
+    trigger: "用 comment-ops 给我生成 20 条评论",
+    keywords: ["生成评论", "活人感", "种草评论", "评论运营", "评论"]
+  },
+  "xiaohongshu-account-recommender": {
+    platform: "workbuddy",
+    desc: "小红书创作者对标账号匹配,KOL 对标、起号参考",
+    trigger: "用 xiaohongshu-account-recommender 给我推荐对标账号",
+    keywords: ["对标账号", "KOL 对标", "起号", "参考账号"]
+  },
+  "xiaohongshu-content-tools": {
+    platform: "workbuddy",
+    desc: "小红书关键词搜索、笔记详情、博主作品,爆款挖掘/竞品分析/KOL 筛选",
+    trigger: "用 xiaohongshu-content-tools 搜爆款",
+    keywords: ["搜笔记", "笔记详情", "博主作品", "爆款", "KOL 筛选"]
+  },
+  "xiaohongshu-crawler-redfox": {
+    platform: "workbuddy",
+    desc: "小红书作品爬取,根据关键词爬取热门作品数据",
+    trigger: "用 xiaohongshu-crawler-redfox 爬关键词数据",
+    keywords: ["爬", "爬取", "小红书数据", "热门作品"]
+  },
+  "xiaohongshu-deep-research": {
+    platform: "workbuddy",
+    desc: "小红书深度调研,爬取帖子、提取高互动内容、生成分析报告",
+    trigger: "用 xiaohongshu-deep-research 调研这个话题",
+    keywords: ["深度调研", "小红书调研", "高互动"]
+  },
+  "xiaohongshu-aggregate-scraper": {
+    platform: "workbuddy",
+    desc: "小红书全场景数据查询,笔记详情/用户数据/搜索/商品/评论/话题",
+    trigger: "用 xiaohongshu-aggregate-scraper 查这条笔记",
+    keywords: ["查", "小红书数据", "笔记详情", "数据查询"]
+  },
+  "xiaohongshu-mcp": {
+    platform: "workbuddy",
+    desc: "小红书自动化,登录、发布图文/视频、搜索、评论、查看主页",
+    trigger: "用 xiaohongshu-mcp 自动发笔记",
+    keywords: ["自动发", "登录", "发布", "自动化"]
+  },
+  "小红书助手": {
+    platform: "workbuddy",
+    desc: "小红书平台自动化操作,登录/发图文视频/搜索/详情/点赞收藏评论",
+    trigger: "用 小红书助手 发一条图文",
+    keywords: ["发笔记", "登录小红书", "小红书自动化", "搜小红书"]
+  },
+  "unclecheng-reduce-ai-perception-v2": {
+    platform: "workbuddy",
+    desc: "去除文本中的 AI 写作痕迹,让文字更像人类写作",
+    trigger: "用 humanizer 把这段去 AI 味",
+    keywords: ["去 AI 味", "降 AI", "更像人", "润色", "改写自然"]
+  },
+  "aihot": {
+    platform: "workbuddy",
+    desc: "AI 行业动态查询,OpenAI/Anthropic/Google 等大模型最新发布",
+    trigger: "用 aihot 看一下今天 AI 圈有什么",
+    keywords: ["AI 资讯", "AI 日报", "大模型", "OpenAI", "Anthropic"]
+  },
+  "data-analysis-skill": {
+    platform: "workbuddy",
+    desc: "数据分析,自动抓取、清洗、可视化、生成报告",
+    trigger: "用 data-analysis-skill 处理这份数据",
+    keywords: ["数据分析", "清洗", "可视化", "出报告"]
+  },
+  "ecom-monitor": {
+    platform: "workbuddy",
+    desc: "电商数据分析,商品价格/库存/竞品价格追踪",
+    trigger: "用 ecom-monitor 监控这个商品",
+    keywords: ["电商", "价格", "库存", "竞品"]
+  },
+  "xlsx-cn": {
+    platform: "workbuddy",
+    desc: "Excel 表格处理,创建/读取/编辑,支持公式、图表",
+    trigger: "用 xlsx-cn 处理这个 Excel",
+    keywords: ["Excel", "表格", "xlsx", "公式", "图表"]
+  },
+  "document-pro": {
+    platform: "workbuddy",
+    desc: "文档处理,读取/解析/提取 PDF、DOCX、PPT 关键信息",
+    trigger: "用 document-pro 解析这份 PDF",
+    keywords: ["PDF", "DOCX", "PPT", "文档解析", "提取信息"]
+  },
+  "document-processing": {
+    platform: "workbuddy",
+    desc: "文档处理通用入口",
+    trigger: "用 document-processing 处理这份文档",
+    keywords: ["文档", "处理文档"]
+  },
+  "cocoloop": {
+    platform: "workbuddy",
+    desc: "Skill 管理器,安装/管理/更新/卸载 Skills",
+    trigger: "用 cocoloop 装一个新 skill",
+    keywords: ["装 skill", "管理 skill", "更新 skill"]
+  },
+  "cocoloop-installer": {
+    platform: "workbuddy",
+    desc: "Skill 安装器",
+    trigger: "用 cocoloop-installer 装一个 skill",
+    keywords: ["装 skill", "安装"]
+  },
+  "skill_2053082035566706688": {
+    platform: "workbuddy",
+    desc: "深度研究工作流,/research 调研、/research-deep 并行搜索、/research-report 汇总",
+    trigger: "用 /research 调研这个话题",
+    keywords: ["深度研究", "调研", "/research", "学术调研"]
+  },
+  "marketplace-skill-installer": {
+    platform: "workbuddy",
+    desc: "WorkBuddy 市场搜 skill",
+    trigger: "用 marketplace-skill-installer 装一个 skill",
+    keywords: ["市场", "搜 skill", "装 skill"]
+  },
+  "读书助手": {
+    platform: "workbuddy",
+    desc: "AI 替你读书,生成知识包、永久卡片、题库",
+    trigger: "用 读书助手 读这本书",
+    keywords: ["读书", "读一本书", "知识包"]
+  },
+  "Shall We Talk": {
+    platform: "workbuddy",
+    desc: "AI 主导的结构化深度对话",
+    trigger: "用 Shall We Talk 跟我聊聊",
+    keywords: ["深度对话", "聊聊", "采访", "认识自己"]
+  },
+  "三明智": {
+    platform: "workbuddy",
+    desc: "思维启动器,分析/对比/评估/严谨/深度",
+    trigger: "用 三明智 分析这个问题",
+    keywords: ["分析", "对比", "评估", "深度", "思维"]
+  },
+  "迁理之外": {
+    platform: "workbuddy",
+    desc: "哲学视角,斯多葛/存在主义/实用主义/分析哲学/唯物辩证法",
+    trigger: "用 迁理之外 换个角度",
+    keywords: ["哲学", "换个角度", "辩证"]
+  },
+  "每日伙伴": {
+    platform: "workbuddy",
+    desc: "早晨规划、晚间复盘、周报月报",
+    trigger: "用 每日伙伴 做今天规划",
+    keywords: ["日记", "复盘", "周报", "月报", "规划"]
+  },
+  "唤醒记忆系统": {
+    platform: "workbuddy",
+    desc: "记忆系统强制刷新器,加载/唤醒记忆",
+    trigger: "用 唤醒记忆系统 加载记忆",
+    keywords: ["记忆", "唤醒", "加载记忆"]
+  },
+  "成长箱": {
+    platform: "workbuddy",
+    desc: "错误记录、晋升检查、错误蒸馏",
+    trigger: "用 成长箱 记个错误",
+    keywords: ["错误", "成长", "记错"]
+  },
+  "系统日志": {
+    platform: "workbuddy",
+    desc: "任务日志写入",
+    trigger: "用 系统日志 记入这次任务",
+    keywords: ["日志", "任务日志", "记录"]
+  },
+  "skill_2053082253572640768": {
+    platform: "workbuddy",
+    desc: "飞书 CLI,消息/文档/表格/日历/审批/任务 200+ 命令",
+    trigger: "用 lark-unified 发条飞书消息",
+    keywords: ["飞书", "lark", "消息", "文档", "表格", "审批"]
+  }
+};
+
+// 推荐组合方案
+const COMBOS = [
+  {
+    match: /(单篇|起量|没起量|推流|数据曲线|自己笔记|互动质量)/,
+    title: "单篇笔记诊断",
+    steps: "zoeforwork-xiaohongshu-singlearticleanalyzer-skill(主分析)→ dbs-ai-check(检查文案 AI 味)→ dbs-xhs-title(出 20 个新标题)"
+  },
+  {
+    match: /(拆爆款|爆款|爆文|为什么火)/,
+    title: "爆款拆解 + 复用",
+    steps: "xhs-viral-note-breakdown(拆这篇爆款)→ xhs-visual-director-skill(参考视觉)→ dbs-xhs-title(借标题套路)→ humanizer-zh(去 AI 味)"
+  },
+  {
+    match: /(视觉|封面|图文|版式|收藏率)/,
+    title: "图文视觉重做",
+    steps: "xhs-visual-director-skill(出视觉方案)→ canvas-design(静态设计)→ humanizer-zh(文案去 AI 味)"
+  },
+  {
+    match: /(标题|改标题|出标题)/,
+    title: "标题优化",
+    steps: "dbs-xhs-title(出 20 个标题)→ humanizer-zh(自然化处理)→ xhs-viral-note-breakdown(参考爆款标题套路)"
+  },
+  {
+    match: /(博主|对标|方法论|持续爆款)/,
+    title: "对标博主研究",
+    steps: "xhs-blogger-deep-research(主研究)→ xhs-competitor-research-v2(WorkBuddy 辅助)→ dbs-benchmark(整理对标方法论)"
+  },
+  {
+    match: /(deck|汇报|复盘|咨询|展示|方案|PPT)/,
+    title: "出咨询级 deck",
+    steps: "content-research-writer(写内容)→ mckinsey-research-deck(做 deck)→ theme-factory(套视觉风格)"
+  },
+  {
+    match: /(联网|调研|查|搜|行业|赛道|找)/,
+    title: "联网调研",
+    steps: "agent-reach(查资料)→ web-access(真打开网页)→ content-research-writer(写成稿)"
+  },
+  {
+    match: /(去 AI|AI 味|自然|更像人|润色)/,
+    title: "去 AI 味",
+    steps: "unclecheng-reduce-ai-perception-v2(主降 AI)→ stop-slop(去空话)→ dbs-ai-check(复查)"
+  },
+  {
+    match: /(诊断|业务|商业模式|目标|问题)/,
+    title: "业务诊断",
+    steps: "dbs(总入口)→ dbs-content(内容方向)→ dbs-goal(目标拆解)→ dbs-action(突破做不动)"
+  },
+  {
+    match: /(写文章|写分析|写报告|研究稿|成文)/,
+    title: "写研究稿",
+    steps: "content-research-writer(主写)→ humanizer-zh(去 AI 味)→ mckinsey-research-deck(转 deck)"
+  },
+  {
+    match: /(拆解|拆|为什么火|套路)/,
+    title: "套路拆解",
+    steps: "xhs-viral-note-breakdown(拆爆款)→ dbs-deconstruct(拆概念)→ dbs-xhs-title(借标题)"
+  },
+  {
+    match: /(周报|汇报|项目|内部)/,
+    title: "内部周报",
+    steps: "internal-comms(写周报)→ humanizer-zh(自然化)→ meeting-notes-and-actions(配会议纪要)"
+  },
+  {
+    match: /(问题定义|需求定义|做个X|想法|solution|产品决策|PRD|MVP|对齐|buy-in|访谈|用户反馈|优先级|trade-off|砍范围)/,
+    title: "产品决策全链路",
+    steps: "problem-definition(定义问题)→ conducting-user-interviews 或 analyzing-user-feedback(验证)→ prioritizing-roadmap 或 evaluating-trade-offs(排序/权衡)→ scoping-cutting(砍范围)→ writing-prds(写 PRD)→ stakeholder-alignment(对齐)→ anti-vibe-writing(去 AI 味收尾)"
+  }
+];
+
+// ============ 渲染层 ============
+
+function switchMode(mode) {
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  if (mode === 'match') {
+    document.querySelectorAll('.mode-btn')[0].classList.add('active');
+    document.getElementById('match-panel').classList.add('active');
+  } else {
+    document.querySelectorAll('.mode-btn')[1].classList.add('active');
+    document.getElementById('index-panel').classList.add('active');
+    renderIndex();
+  }
+}
+
+function toggleLayer(header) {
+  header.classList.toggle('collapsed');
+  const body = header.nextElementSibling;
+  body.classList.toggle('hidden');
+}
+
+function setNeed(text) {
+  document.getElementById('needInput').value = text;
+  doMatch();
+}
+
+function doMatch() {
+  const input = document.getElementById('needInput').value.trim();
+  if (!input) return;
+  const resultSection = document.getElementById('resultSection');
+  const matches = scoreSkills(input);
+  const combos = COMBOS.filter(c => c.match.test(input));
+  let html = '';
+
+  if (combos.length > 0) {
+    html += '<h3>推荐组合方案</h3>';
+    combos.slice(0, 2).forEach(c => {
+      html += `<div class="combo-card">
+        <div class="combo-title">${c.title}</div>
+        <div class="combo-steps">${c.steps}</div>
+        <div class="combo-trigger">输入框直接说:"${c.title}" 即可触发</div>
+      </div>`;
+    });
+  }
+
+  if (matches.length > 0) {
+    html += '<h3>匹配到的 skill(按相关度排序)</h3>';
+    matches.slice(0, 6).forEach(m => {
+      const s = SKILLS[m.name];
+      const pf = s.platform === 'codex' ? 'codex' : 'workbuddy';
+      const pfLabel = s.platform === 'codex' ? 'Codex' : 'WorkBuddy';
+      html += `<div class="result-card">
+        <span class="skill-name">${m.name}</span>
+        <span class="platform ${pf}">${pfLabel}</span>
+        <div class="desc">${s.desc}</div>
+        <div class="trigger">触发: ${s.trigger}</div>
+        <div class="trigger">命中关键词: ${m.hits.join('、')}</div>
+      </div>`;
+    });
+  }
+
+  if (!combos.length && !matches.length) {
+    html = '<div class="result-empty">没匹配到。换个说法,或切换到完整索引手动找</div>';
+  }
+
+  resultSection.innerHTML = html;
+}
+
+function scoreSkills(input) {
+  const results = [];
+  const lower = input.toLowerCase();
+  for (const [name, s] of Object.entries(SKILLS)) {
+    let hits = [];
+    let score = 0;
+    if (s.keywords) {
+      s.keywords.forEach(kw => {
+        if (lower.includes(kw.toLowerCase())) {
+          hits.push(kw);
+          score += 1;
+        }
+      });
+    }
+    if (s.desc && lower.split(/\s+/).some(w => w.length >= 2 && s.desc.toLowerCase().includes(w))) {
+      score += 0.5;
+    }
+    if (s.trigger && lower.split(/\s+/).some(w => w.length >= 2 && s.trigger.toLowerCase().includes(w))) {
+      score += 0.5;
+    }
+    if (score > 0) {
+      results.push({ name, score, hits });
+    }
+  }
+  return results.sort((a, b) => b.score - a.score);
+}
+
+function renderIndex() {
+  const layers = { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [] ,
+  "ad-production-analytics-feedback__skillhub": {
+    platform: "workbuddy",
+    desc: "广告投放分析与反馈，追踪投放效果、分析数据、生成优化建议",
+    trigger: "用 ad-production-analytics-feedback 分析这批投放数据",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "deep-research": {
+    platform: "workbuddy",
+    desc: "深度研究工作流，多轮搜索+并行分析+汇总报告",
+    trigger: "用 deep-research 深度调研这个话题",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "eb-marketing__skillhub": {
+    platform: "workbuddy",
+    desc: "EB营销工具，品牌营销策略与执行",
+    trigger: "用 eb-marketing 做品牌营销分析",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "html-deploy": {
+    platform: "workbuddy",
+    desc: "HTML项目部署，将本地静态站点一键部署上线",
+    trigger: "用 html-deploy 把这个页面部署上去",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "humanizer": {
+    platform: "workbuddy",
+    desc: "英文去AI味，把英文文案改得更自然更像人写",
+    trigger: "用 humanizer 把这段英文改得更自然",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "hv-analysis": {
+    platform: "workbuddy",
+    desc: "HV分析，热点与趋势分析",
+    trigger: "用 hv-analysis 分析这个热点",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "ima-skills": {
+    platform: "workbuddy",
+    desc: "IMA知识库技能，查询和管理IMA知识空间",
+    trigger: "用 ima-skills 查一下知识库",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "khazix-writer": {
+    platform: "workbuddy",
+    desc: "Khazix写作助手，智能写作与内容生成",
+    trigger: "用 khazix-writing 写一篇文章",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "kol-brief-zh__skillhub": {
+    platform: "workbuddy",
+    desc: "KOL简报中文版，快速生成KOL投放简报",
+    trigger: "用 kol-brief-zh 生成一份KOL简报",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "lark-unified": {
+    platform: "workbuddy",
+    desc: "飞书统一工具，消息/文档/表格/日历/审批/任务 200+命令",
+    trigger: "用 lark-unified 发条飞书消息",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "markitdown-skill": {
+    platform: "workbuddy",
+    desc: "Markdown转换工具，将各种格式文档转为Markdown",
+    trigger: "用 markitdown 把这个文档转成Markdown",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "mimo-xhs-data-api__skillhub": {
+    platform: "workbuddy",
+    desc: "小红书数据API，通过API查询小红书笔记/博主/话题数据",
+    trigger: "用 mimo-xhs-data-api 查小红书数据",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "minimax-docx": {
+    platform: "workbuddy",
+    desc: "DOCX文档生成，创建专业格式的Word文档",
+    trigger: "用 minimax-docx 生成一份Word文档",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "minimax-pdf": {
+    platform: "workbuddy",
+    desc: "PDF文档生成，创建专业格式的PDF文件",
+    trigger: "用 minimax-pdf 生成一份PDF",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "minimax-xlsx": {
+    platform: "workbuddy",
+    desc: "XLSX表格生成，创建专业格式的Excel表格",
+    trigger: "用 minimax-xlsx 生成一份Excel表格",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "neat-freak": {
+    platform: "workbuddy",
+    desc: "文件整理与清理，扫描磁盘空间、整理文件结构",
+    trigger: "用 neat-freak 整理一下磁盘空间",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "performance-management-assistant": {
+    platform: "workbuddy",
+    desc: "绩效管理助手，绩效考核、目标追踪、晋升准备",
+    trigger: "用 performance-management-assistant 做绩效分析",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "pptx-generator": {
+    platform: "workbuddy",
+    desc: "PPT生成器，将内容快速生成演示文稿",
+    trigger: "用 pptx-generator 把这个内容做成PPT",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "pua": {
+    platform: "workbuddy",
+    desc: "PUA系列总入口，个人成长与思维工具集",
+    trigger: "用 pua 启动成长工具",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "pua-ding": {
+    platform: "workbuddy",
+    desc: "PUA钉钉版，钉钉集成的成长与效率工具",
+    trigger: "用 pua-ding 在钉钉里做效率分析",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "pua-mama": {
+    platform: "workbuddy",
+    desc: "PUA妈妈版，亲子关系与家庭成长工具",
+    trigger: "用 pua-mama 做家庭成长分析",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "pua-p10": {
+    platform: "workbuddy",
+    desc: "PUA P10版，高级项目经理成长工具",
+    trigger: "用 pua-p10 做项目经理分析",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "pua-p7": {
+    platform: "workbuddy",
+    desc: "PUA P7版，中级职场成长工具",
+    trigger: "用 pua-p7 做职场分析",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "pua-p9": {
+    platform: "workbuddy",
+    desc: "PUA P9版，资深职场成长工具",
+    trigger: "用 pua-p9 做资深分析",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "pua-pro": {
+    platform: "workbuddy",
+    desc: "PUA专业版，专业级个人成长与诊断",
+    trigger: "用 pua-pro 做专业诊断",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "pua-pua-loop": {
+    platform: "workbuddy",
+    desc: "PUA循环版，持续成长循环工具",
+    trigger: "用 pua-pua-loop 做循环成长",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "pua-shot": {
+    platform: "workbuddy",
+    desc: "PUA速射版，快速行动与决策工具",
+    trigger: "用 pua-shot 快速决策",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "pua-yes": {
+    platform: "workbuddy",
+    desc: "PUA确认版，快速确认与执行工具",
+    trigger: "用 pua-yes 快速确认方案",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "storage-analyzer": {
+    platform: "workbuddy",
+    desc: "存储空间分析，扫描磁盘使用情况、找出大文件和冗余",
+    trigger: "用 storage-analyzer 分析磁盘空间",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "xhs-content-research__skillhub": {
+    platform: "workbuddy",
+    desc: "小红书内容研究，选题方向、内容策略、热门话题挖掘",
+    trigger: "用 xhs-content-research 研究内容方向",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "xhs-creator-content-research__skillhub": {
+    platform: "workbuddy",
+    desc: "小红书创作者内容研究，分析博主内容策略和创作方法",
+    trigger: "用 xhs-creator-content-research 分析博主内容",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "xhs-ops-copilot__skillhub": {
+    platform: "workbuddy",
+    desc: "小红书运营助手，日常运营决策、内容排期、数据复盘",
+    trigger: "用 xhs-ops-copilot 做运营决策",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "xhs-topic-analysis-v2__skillhub": {
+    platform: "workbuddy",
+    desc: "小红书话题分析v2，话题热度、参与度、趋势预测",
+    trigger: "用 xhs-topic-analysis-v2 分析话题热度",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "xiaohongshujuguang__skillhub": {
+    platform: "workbuddy",
+    desc: "小红书聚光投放，广告投放管理、数据追踪、ROI分析",
+    trigger: "用 xiaohongshujuguang 管理聚光投放",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "xurl": {
+    platform: "workbuddy",
+    desc: "URL短链接工具，生成和管理短链接",
+    trigger: "用 xurl 生成一个短链接",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "yt-competitive-analysis": {
+    platform: "workbuddy",
+    desc: "YouTube竞品分析，研究竞品频道策略和内容表现",
+    trigger: "用 yt-competitive-analysis 分析YouTube竞品",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "3D模型与视频特效": {
+    platform: "workbuddy",
+    desc: "3D模型生成和视频特效，文生3D/图生3D/模板视频特效",
+    trigger: "用 3D模型与视频特效 生成一个3D模型",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "cloudstudio-deploy": {
+    platform: "workbuddy",
+    desc: "CloudStudio部署，将本地静态站点一键部署到云端",
+    trigger: "用 cloudstudio-deploy 部署这个网站",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "expert-manager": {
+    platform: "workbuddy",
+    desc: "专家包管理器，创建/修改/审查/更新专家包",
+    trigger: "用 expert-manager 创建一个专家包",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "neodata-financial-search": {
+    platform: "workbuddy",
+    desc: "NeoData金融数据搜索，自然语言查询股票/基金/指数/宏观/外汇",
+    trigger: "用 neodata-financial-search 查一下茅台股价",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "skill-creator": {
+    platform: "workbuddy",
+    desc: "Skill创建器，创建和更新WorkBuddy技能",
+    trigger: "用 skill-creator 创建一个新skill",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "wb-finance-skill": {
+    platform: "workbuddy",
+    desc: "金融场景总入口，股票/基金/ETF/宏观/外汇/财报/估值全覆盖",
+    trigger: "用 wb-finance-skill 查金融数据",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ,  + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "westock-data": {
+    platform: "workbuddy",
+    desc: "金融市场结构化数据查询，股票/ETF/指数/板块/期货/外汇行情与数据",
+    trigger: "用 westock-data 查个股行情",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "westock-tool": {
+    platform: "workbuddy",
+    desc: "选股选基工具，按条件/策略/标签/排行批量筛选股票或ETF",
+    trigger: "用 westock-tool 选几只高股息ETF",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "weixinpay-feedback": {
+    platform: "workbuddy",
+    desc: "微信支付问题反馈，AI支付/专属卡开通绑定或支付异常上报",
+    trigger: "用 weixinpay-feedback 反馈微信支付问题",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "weixinpay-register": {
+    platform: "workbuddy",
+    desc: "微信支付开通绑定，开通/绑定/激活微信AI支付或AI专属卡",
+    trigger: "用 weixinpay-register 开通微信AI支付",
+    keywords: [ + k + ,  + k + ,  + k + ,  + k + ,  + k + ,  + k + ]
+  },
+  "weixinpay-required-filter": {
+    platform: "workbuddy",
+    desc: "微信支付授权过滤，过滤微信AI支付授权信息防止误展示",
+    trigger: "自动触发，无需手动调用",
+    keywords: [ + k + ,  + k + ,  + k + ]
+  }
+,
+  "lark-approval": {
+    platform: "codex",
+    desc: "飞书审批：查询与处理当前用户的审批任务，覆盖待本人审批的任务与本人发起的实例",
+    trigger: "使用 $lark-approval 处理审批",
+    keywords: ["飞书审批", "审批", "审批待办", "审批处理", "lark approval"]
+  },
+  "lark-attendance": {
+    platform: "codex",
+    desc: "飞书考勤打卡：查询自己的考勤打卡记录",
+    trigger: "使用 $lark-attendance 查看考勤",
+    keywords: ["飞书考勤", "考勤", "打卡", "打卡记录", "attendance"]
+  },
+  "lark-base": {
+    platform: "codex",
+    desc: "飞书多维表格操作：建表、字段、记录、视图、统计、公式/lookup、表单、仪表盘、workflow、角色权限",
+    trigger: "使用 $lark-base 操作多维表格",
+    keywords: ["飞书多维表格", "多维表格", "Base", "bitable", "建表", "记录", "仪表盘"]
+  },
+  "lark-calendar": {
+    platform: "codex",
+    desc: "飞书日历：管理日程和会议室，查看/搜索/创建/更新日程、管理参会人、查询忙闲、预定会议室",
+    trigger: "使用 $lark-calendar 管理日程",
+    keywords: ["飞书日历", "日历", "日程", "会议", "会议室", "忙闲", "calendar"]
+  },
+  "lark-contact": {
+    platform: "codex",
+    desc: "飞书通讯录：按姓名/邮箱解析open_id，或按open_id反查姓名/部门/邮箱/联系方式",
+    trigger: "使用 $lark-contact 查找联系人",
+    keywords: ["飞书通讯录", "通讯录", "联系人", "open_id", "姓名查询", "邮箱查询"]
+  },
+  "lark-doc": {
+    platform: "codex",
+    desc: "飞书云文档：读取和编辑飞书文档内容，支持文档URL/token、创建/编辑文档、插入/下载图片附件",
+    trigger: "使用 $lark-doc 操作云文档",
+    keywords: ["飞书文档", "云文档", "Docx", "Wiki文档", "文档编辑", "文档读取"]
+  },
+  "lark-drive": {
+    platform: "codex",
+    desc: "飞书云空间：管理Drive文件和文件夹，上传/下载、创建文件夹、复制/移动/删除、评论/权限/订阅",
+    trigger: "使用 $lark-drive 管理云空间",
+    keywords: ["飞书云盘", "云空间", "Drive", "文件上传", "文件下载", "云盘管理"]
+  },
+  "lark-im": {
+    platform: "codex",
+    desc: "飞书即时通讯：收发消息、搜索聊天记录、管理群聊成员、上传下载图片文件、表情回复、加急通知",
+    trigger: "使用 $lark-im 发消息",
+    keywords: ["飞书消息", "即时通讯", "发消息", "群聊", "聊天记录", "IM"]
+  },
+  "lark-mail": {
+    platform: "codex",
+    desc: "飞书邮箱：draft/compose/send/reply/forward/read/search，管理草稿/文件夹/标签/联系人/附件/邮件规则",
+    trigger: "使用 $lark-mail 处理邮件",
+    keywords: ["飞书邮箱", "邮件", "发邮件", "收邮件", "邮箱", "mail"]
+  },
+  "lark-minutes": {
+    platform: "codex",
+    desc: "飞书妙记：搜索妙记列表、查看基础信息、下载音视频、上传音视频生成妙记、更新标题、替换说话人",
+    trigger: "使用 $lark-minutes 查看妙记",
+    keywords: ["飞书妙记", "妙记", "纪要", "逐字稿", "音视频转写", "minutes"]
+  },
+  "lark-shared": {
+    platform: "codex",
+    desc: "飞书认证与授权：lark-cli的auth login、切换用户/bot身份、处理权限错误和scope问题",
+    trigger: "使用 $lark-shared 配置飞书认证",
+    keywords: ["飞书认证", "auth login", "权限", "授权", "lark-cli配置", "身份切换"]
+  },
+  "lark-sheets": {
+    platform: "codex",
+    desc: "飞书电子表格：创建/操作电子表格，管理工作表与行列结构、读写单元格、查找替换、批量更新、图表/透视表/条件格式",
+    trigger: "使用 $lark-sheets 操作电子表格",
+    keywords: ["飞书表格", "电子表格", "Sheets", "单元格", "公式", "图表", "透视表"]
+  },
+  "lark-task": {
+    platform: "codex",
+    desc: "飞书任务：管理任务/清单和任务智能体，创建待办、查看/更新状态、拆分子任务、分配协作成员",
+    trigger: "使用 $lark-task 管理任务",
+    keywords: ["飞书任务", "任务", "待办", "清单", "子任务", "task"]
+  },
+  "lark-vc": {
+    platform: "codex",
+    desc: "飞书视频会议：搜索历史会议记录、查询会议纪要（总结/待办/章节/逐字稿）、查询参会人快照",
+    trigger: "使用 $lark-vc 查看会议记录",
+    keywords: ["飞书会议", "视频会议", "会议纪要", "参会人", "VC", "会议记录"]
+  },
+  "lark-wiki": {
+    platform: "codex",
+    desc: "飞书知识库：管理知识空间、空间成员和文档节点，创建/查询空间、浏览/组织文档层级结构",
+    trigger: "使用 $lark-wiki 操作知识库",
+    keywords: ["飞书知识库", "知识库", "知识空间", "Wiki", "文档节点", "空间成员"]
+  },
+  "lark-workflow-meeting-summary": {
+    platform: "codex",
+    desc: "会议纪要整理工作流：汇总指定时间范围内的会议纪要并生成结构化报告",
+    trigger: "使用 $lark-workflow-meeting-summary 整理会议纪要",
+    keywords: ["会议纪要整理", "纪要报告", "会议周报", "纪要汇总", "workflow"]
+  },
+  "lark-workflow-standup-report": {
+    platform: "codex",
+    desc: "日程待办摘要：编排calendar+agenda和task+get-my-tasks，生成指定日期的日程与未完成任务摘要",
+    trigger: "使用 $lark-workflow-standup-report 生成日程摘要",
+    keywords: ["日程摘要", "待办摘要", "standup", "日程安排", "日报", "每日摘要"]
+  }
+,
+  "ache-chaijie-skill": {
+    platform: "codex",
+    desc: "小红书账号与竞品拆解。用户提供1-5个账号链接时直接分析；需要找对标时，先确认品类、账号类型、目标受众、内容形态和转化目标，再推荐5个经来源验证的候选账号。结合真实封面视觉审计和小红书内容机制，输出爆款归因、可复制公式、选题建议，并自动生成可视化HTML报告",
+    trigger: "使用 $ache-chaijie-skill：请帮我处理[具体任务]",
+    keywords: ["小红书拆解", "账号拆解", "竞品拆解", "对标账号", "爆款归因", "小红书分析"]
+  },
+  "xhs-visual-director": {
+    platform: "codex",
+    desc: "小红书轮播图视觉规划、封面重设计、3:4图片逐页视觉方向、图像提示词生成",
+    trigger: "使用 $xhs-visual-director：请帮我处理[具体任务]",
+    keywords: ["小红书视觉", "封面设计", "轮播图", "3:4图片", "视觉方向", "XHS视觉"]
+  },
+  "xiaohongshu-viral-breakdown": {
+    platform: "codex",
+    desc: "拆解分析单篇小红书爆款笔记：评估指标、标题、封面、内容结构、关键词和互动设计",
+    trigger: "使用 $xiaohongshu-viral-breakdown：请帮我处理[具体任务]",
+    keywords: ["小红书爆款", "爆款拆解", "笔记分析", "互动分析", "viral breakdown"]
+  },
+  "notebooklm": {
+    platform: "codex",
+    desc: "直接从Codex查询Google NotebookLM笔记本，获取有来源引用、带引用标注的回答",
+    trigger: "使用 $notebooklm：请帮我处理[具体任务]",
+    keywords: ["NotebookLM", "笔记本查询", "Google Notebook", "来源引用", "citation"]
+  },
+  "scrapling-official": {
+    platform: "codex",
+    desc: "用Scrapling抓取网页，支持反爬绕过（Cloudflare Turnstile）、隐身浏览、爬虫框架、自适应抓取",
+    trigger: "使用 $scrapling-official：请帮我处理[具体任务]",
+    keywords: ["网页抓取", "爬虫", "scrapling", "反爬", "Cloudflare绕过", "stealth"]
+  },
+  "frontend-design": {
+    platform: "codex",
+    desc: "构建新UI或重塑现有界面时的视觉设计指引：美学方向、字体、配色、间距、布局节奏",
+    trigger: "使用 $frontend-design：请帮我处理[具体任务]",
+    keywords: ["前端设计", "UI设计", "视觉设计", "字体", "配色", "布局"]
+  },
+  "code-review": {
+    platform: "codex",
+    desc: "从固定点（commit/branch/tag/merge-base）审查代码变更，沿标准和意图两条轴评估",
+    trigger: "使用 $code-review：请帮我处理[具体任务]",
+    keywords: ["代码审查", "code review", "审查变更", "标准审查", "意图审查"]
+  },
+  "hatch-pet": {
+    platform: "codex",
+    desc: "创建、修复、验证、视觉QA和打包Codex兼容v2动画宠物，从角色艺术、生成图片或品牌素材",
+    trigger: "使用 $hatch-pet：请帮我处理[具体任务]",
+    keywords: ["宠物动画", "hatch pet", "动画角色", "pet", "v2宠物"]
+  },
+  "setup-matt-pocock-skills": {
+    platform: "codex",
+    desc: "配置工程skills所需的issue tracker、triage标签词汇和领域文档布局，首次使用前运行一次",
+    trigger: "使用 $setup-matt-pocock-skills：请帮我处理[具体任务]",
+    keywords: ["skills配置", "issue tracker", "triage标签", "工程配置", "matt pocock"]
+  },
+  "tdd": {
+    platform: "codex",
+    desc: "测试驱动开发（Test-Driven Development）",
+    trigger: "使用 $tdd：请帮我处理[具体任务]",
+    keywords: ["TDD", "测试驱动", "test driven", "单元测试", "先写测试"]
+  },
+  "to-spec": {
+    platform: "codex",
+    desc: "将当前对话转化为规格文档并发布到项目issue tracker，无需访谈，直接综合已讨论内容",
+    trigger: "使用 $to-spec：请帮我处理[具体任务]",
+    keywords: ["规格文档", "spec", "技术规格", "规格生成", "规格发布"]
+  },
+  "to-tickets": {
+    platform: "codex",
+    desc: "将计划、规格或当前对话拆解为一组tracer-bullet tickets，每个声明阻塞边，发布到配置的issue tracker",
+    trigger: "使用 $to-tickets：请帮我处理[具体任务]",
+    keywords: ["拆票", "tickets", "tracer-bullet", "任务拆解", "阻塞声明"]
+  },
+  "bazi": {
+    platform: "codex",
+    desc: "四柱八字专业排盘与解盘：排盘、格局判断、十神分析、大运流年、喜用神、命局分析",
+    trigger: "使用 $bazi：请帮我处理[具体任务]",
+    keywords: ["八字", "四柱", "天干地支", "十神", "排盘", "命局", "喜用神"]
+  },
+  "qimen-dunjia": {
+    platform: "codex",
+    desc: "奇门遁甲排盘、解盘、择时、方位判断与理论教学。正式排盘前先做结构化访谈",
+    trigger: "使用 $qimen-dunjia：请帮我处理[具体任务]",
+    keywords: ["奇门遁甲", "奇门排盘", "择吉", "方位选择", "趋吉避凶", "时家奇门"]
+  },
+  "mckinsey-deck": {
+    platform: "codex",
+    desc: "将任意内容转化为顶级McKinsey风格演示——1280×720翻页HTML演示文稿，也可打印为干净的逐页PDF",
+    trigger: "使用 $mckinsey-deck：请帮我处理[具体任务]",
+    keywords: ["McKinsey", "演示文稿", "deck", "翻页PPT", "HTML演示", "麦肯锡风格"]
+  }
+};
+  const wb = [];
+  for (const [name, s] of Object.entries(SKILLS)) {
+    if (s.platform === 'codex' && layers[s.layer]) {
+      layers[s.layer].push({ name, ...s });
+    } else if (s.platform === 'workbuddy') {
+      wb.push({ name, ...s });
+    }
+  }
+
+  for (let i = 1; i <= 6; i++) {
+    const el = document.getElementById('layer-' + i);
+    el.innerHTML = renderSkillList(layers[i]);
+  }
+  document.getElementById('layer-wb').innerHTML = renderSkillList(wb);
+}
+
+function renderSkillList(list) {
+  if (!list || list.length === 0) return '<div class="result-empty">暂无</div>';
+  return list.map(s => {
+    const pf = s.platform === 'codex' ? 'codex' : 'workbuddy';
+    const pfLabel = s.platform === 'codex' ? 'Codex' : 'WorkBuddy';
+    return `<div class="skill-item">
+      <span class="skill-name">${s.name}</span>
+      <span class="platform ${pf}">${pfLabel}</span>
+      <div class="desc">${s.desc}</div>
+      <div class="trigger">${s.trigger || ''}</div>
+    </div>`;
+  }).join('');
+}
+
+// 初始化:默认展开第一层
+window.addEventListener('load', () => {
+  if (document.getElementById('index-panel').classList.contains('active')) {
+    renderIndex();
+  }
+});
+</script>
+
+</body>
+</html>
